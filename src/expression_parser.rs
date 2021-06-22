@@ -8,7 +8,7 @@ use crate::{
     expression_parse_error::ExpressionParseError,
     operator::Operator,
     parenthesis::{Parenthesis, ParenthesisVariant},
-    parsable_expression::{self, ParsableExpression, RpnItem},
+    parsable_expression::{self, NonConstant, ParsableExpression, RpnItem},
 };
 
 pub struct ExpressionParser {
@@ -35,8 +35,8 @@ impl ExpressionParser {
             self.parse_token(field.as_str())?;
         }
 
-        let mut rpn_stack = vec![];
-        let mut non_constant_stack = vec![];
+        let mut rpn_stack: Vec<RpnItem> = vec![];
+        let mut non_constant_stack: Vec<NonConstant> = vec![];
 
         for expression in self.tokens.drain(0..) {
             expression.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack)?;
@@ -53,10 +53,10 @@ impl ExpressionParser {
             }
         }
 
-        // Temporary
-        for r in rpn_stack.iter() {
-            println!("{:?}", r);
-        }
+        // TODO: Remove
+        //for r in rpn_stack.iter() {
+        //    println!("{:?}", r);
+        //}
 
         Ok(rpn_stack)
     }
