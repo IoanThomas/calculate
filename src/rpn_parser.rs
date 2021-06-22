@@ -22,7 +22,10 @@ impl RpnParser {
             }
         }
 
-        Ok(self.value_stack.remove(0))
+        match self.value_stack.len() {
+            0 => Err(RpnParseError {}),
+            _ => Ok(self.value_stack.remove(0)),
+        }
     }
 
     fn parse_operator(&mut self, operator: Operator) -> Result<(), RpnParseError> {
