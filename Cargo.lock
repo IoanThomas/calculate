@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "calculate-rust"
+name = "calculate"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",

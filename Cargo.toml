@@ -1,5 +1,5 @@
 [package]
-name = "calculate-rust"
+name = "calculate"
 version = "0.1.0"
 authors = ["Ioan Thomas"]
 edition = "2018"
