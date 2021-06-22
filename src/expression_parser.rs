@@ -12,17 +12,15 @@ use crate::{
 };
 
 pub struct ExpressionParser {
-    rpn_stack: Vec<Box<dyn ParsableExpression>>,
+    tokens: Vec<Box<dyn ParsableExpression>>,
 }
 
 impl ExpressionParser {
     pub fn new() -> ExpressionParser {
-        ExpressionParser {
-            rpn_stack: vec![]
-        }
+        ExpressionParser { tokens: vec![] }
     }
-    
-    pub fn parse_to_rpn(&mut self, expression: &str) -> Result<(), ExpressionParseError> {
+
+    pub fn parse_to_rpn(&mut self, expression: &str) -> Result<Vec<RpnItem>, ExpressionParseError> {
         // Split expression
         let regex = match Regex::new(r"([+\-*/\^\(\)]|\d+)") {
             Ok(regex) => regex,
@@ -37,18 +35,15 @@ impl ExpressionParser {
             self.parse_token(field.as_str())?;
         }
 
-        // Return RPN
-
         let mut rpn_stack = vec![];
         let mut non_constant_stack = vec![];
-        //self.rpn_stack.iter().for_each(|r: Box<dyn ParsableExpression>| {r.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack);});
 
-        for r in self.rpn_stack.drain(0..) {
-            r.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack)?;
+        for expression in self.tokens.drain(0..) {
+            expression.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack)?;
         }
 
-        for non in non_constant_stack {
-            match non {
+        for non_constant in non_constant_stack {
+            match non_constant {
                 parsable_expression::NonConstant::Operator(operator) => {
                     rpn_stack.push(RpnItem::Operator(operator))
                 }
@@ -58,11 +53,12 @@ impl ExpressionParser {
             }
         }
 
-        for r in rpn_stack {
+        // Temporary
+        for r in rpn_stack.iter() {
             println!("{:?}", r);
         }
 
-        Ok(())
+        Ok(rpn_stack)
     }
 
     fn parse_token(&mut self, token: &str) -> Result<(), ExpressionParseError> {
@@ -71,35 +67,35 @@ impl ExpressionParser {
         };
 
         match token {
-            "+" => self.rpn_stack.push(Box::new(Operator {
+            "+" => self.tokens.push(Box::new(Operator {
                 symbol: "+",
                 precedence: 2,
                 is_left_associative: true,
             })),
-            "-" => self.rpn_stack.push(Box::new(Operator {
+            "-" => self.tokens.push(Box::new(Operator {
                 symbol: "-",
                 precedence: 2,
                 is_left_associative: true,
             })),
-            "*" => self.rpn_stack.push(Box::new(Operator {
+            "*" => self.tokens.push(Box::new(Operator {
                 symbol: "*",
                 precedence: 3,
                 is_left_associative: true,
             })),
-            "/" => self.rpn_stack.push(Box::new(Operator {
+            "/" => self.tokens.push(Box::new(Operator {
                 symbol: "/",
                 precedence: 3,
                 is_left_associative: true,
             })),
-            "^" => self.rpn_stack.push(Box::new(Operator {
+            "^" => self.tokens.push(Box::new(Operator {
                 symbol: "^",
                 precedence: 5,
                 is_left_associative: true,
             })),
-            "(" => self.rpn_stack.push(Box::new(Parenthesis {
+            "(" => self.tokens.push(Box::new(Parenthesis {
                 variant: ParenthesisVariant::Left,
             })),
-            ")" => self.rpn_stack.push(Box::new(Parenthesis {
+            ")" => self.tokens.push(Box::new(Parenthesis {
                 variant: ParenthesisVariant::Right,
             })),
             _ => {}
@@ -109,7 +105,7 @@ impl ExpressionParser {
     }
 
     fn parse_number(&mut self, number: BigDecimal) -> Result<(), ExpressionParseError> {
-        self.rpn_stack.push(Box::new(Constant { value: number }));
+        self.tokens.push(Box::new(Constant { value: number }));
 
         Ok(())
     }

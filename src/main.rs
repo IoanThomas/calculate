@@ -9,5 +9,9 @@ mod parsable_expression;
 
 fn main() {
     let mut expression_parser = ExpressionParser::new();
-    expression_parser.parse_to_rpn("4*(3+5)/2");
+    if let Ok(rpn_stack) = expression_parser.parse_to_rpn("4*(3+5)/2") {
+        todo!();
+    } else {
+        println!("Error whilst parsing expression");
+    }
 }
