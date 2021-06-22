@@ -1,6 +1,7 @@
 use bigdecimal::BigDecimal;
 
-use crate::{operator::Operator, parsable_expression::RpnItem, rpn_parse_error::RpnParseError};
+use crate::operator::Operator;
+use crate::{parsable_expression::RpnItem, rpn_parse_error::RpnParseError};
 
 pub struct RpnParser {
     value_stack: Vec<BigDecimal>,
@@ -32,7 +33,6 @@ impl RpnParser {
         match operator.symbol {
             "+" => {
                 let top_value = self.pop_top_value()?;
-                //*self.value_stack.last_mut().unwrap() += top_value;
                 *self.get_top_value()? += top_value;
             }
             "-" => {
@@ -52,6 +52,7 @@ impl RpnParser {
             }
             "^" => {
                 let _top_value = self.pop_top_value()?;
+                // TODO: BigDecimal doesn't have power operations
                 todo!();
             }
             _ => {}
