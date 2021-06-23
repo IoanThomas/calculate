@@ -21,12 +21,18 @@ impl RpnParser {
             match rpn_item {
                 RpnItem::Constant(constant) => self.value_stack.push(constant.value),
                 RpnItem::Operator(operator) => self.parse_operator(operator)?,
-                RpnItem::Parenthesis(_) => return Err(RpnParseError {}),
+                RpnItem::Parenthesis(_) => {
+                    return Err(RpnParseError {
+                        message: "Unexpected parenthesis",
+                    })
+                }
             }
         }
 
         match self.value_stack.len() {
-            0 => Err(RpnParseError {}),
+            0 => Err(RpnParseError {
+                message: "Empty value stack",
+            }),
             _ => Ok(self.value_stack.remove(0)),
         }
     }
@@ -50,7 +56,9 @@ impl RpnParser {
                 let itr = self.pop_top_value()?;
 
                 if top_value.is_zero() {
-                    return Err(RpnParseError {});
+                    return Err(RpnParseError {
+                        message: "Division by zero",
+                    });
                 }
 
                 // /= Doesn't seem to work with BigDecimal
@@ -77,14 +85,18 @@ impl RpnParser {
     fn pop_top_value(&mut self) -> Result<BigDecimal, RpnParseError> {
         match self.value_stack.pop() {
             Some(top_value) => Ok(top_value),
-            None => Err(RpnParseError {}),
+            None => Err(RpnParseError {
+                message: "Empty value stack",
+            }),
         }
     }
 
     fn get_top_value(&mut self) -> Result<&mut BigDecimal, RpnParseError> {
         match self.value_stack.last_mut() {
             Some(top_value) => Ok(top_value),
-            None => Err(RpnParseError {}),
+            None => Err(RpnParseError {
+                message: "Empty value stack",
+            }),
         }
     }
 }

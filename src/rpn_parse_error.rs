@@ -1,1 +1,3 @@
-pub struct RpnParseError {}
+pub struct RpnParseError {
+    pub message: &'static str,
+}

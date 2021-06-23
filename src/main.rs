@@ -30,8 +30,8 @@ fn main() {
 
     let result = match rpn_parser.parse_rpn(&mut rpn_stack) {
         Ok(result) => result,
-        Err(_) => {
-            println!("Error whilst parsing RPN");
+        Err(error) => {
+            println!("Error whilst parsing RPN: {}", error.message);
             return;
         }
     };
