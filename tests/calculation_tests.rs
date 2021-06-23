@@ -63,3 +63,9 @@ fn division() {
     calculate_assert_eq("26/2", "13");
     calculate_assert_eq("5/2", "2.5");
 }
+
+#[test]
+fn combined() {
+    calculate_assert_eq("1+1/4", "1.25");
+    calculate_assert_eq("4*(3+5)/2", "16");
+}
