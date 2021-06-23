@@ -22,7 +22,7 @@ impl ExpressionParser {
 
     pub fn parse_to_rpn(&mut self, expression: &str) -> Result<Vec<RpnItem>, ExpressionParseError> {
         // Split expression
-        let regex = match Regex::new(r"([+\-*/\^\(\)]|\d+)") {
+        let regex = match Regex::new(r"([+\-*/\^\(\)]|\d*\.?\d*)") {
             Ok(regex) => regex,
             Err(e) => {
                 println!("{:?}", e);
