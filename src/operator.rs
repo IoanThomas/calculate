@@ -17,7 +17,7 @@ impl ParsableExpression for Operator {
         non_constant_stack: &mut Vec<NonConstant>,
     ) -> Result<(), ExpressionParseError> {
         if !non_constant_stack.is_empty() {
-            let top_stack_precedence = match non_constant_stack.last() {
+            let mut top_stack_precedence = match non_constant_stack.last() {
                 Some(top_stack) => match top_stack {
                     NonConstant::Operator(operator) => operator.precedence,
                     NonConstant::Parenthesis(_) => 0,
@@ -25,7 +25,7 @@ impl ParsableExpression for Operator {
                 None => 0,
             };
 
-            if (self.is_left_associative && self.precedence <= top_stack_precedence)
+            while (self.is_left_associative && self.precedence <= top_stack_precedence)
                 || (self.precedence < top_stack_precedence)
             {
                 match non_constant_stack.pop() {
@@ -37,10 +37,24 @@ impl ParsableExpression for Operator {
                     },
                     None => {}
                 }
+
+                if non_constant_stack.is_empty() {
+                    break;
+                }
+
+                top_stack_precedence = match non_constant_stack.last() {
+                    Some(top_stack) => match top_stack {
+                        NonConstant::Operator(operator) => operator.precedence,
+                        NonConstant::Parenthesis(_) => 0,
+                    },
+                    None => 0,
+                };
             }
         }
 
         non_constant_stack.push(NonConstant::Operator(*self));
+
+        println!();
 
         Ok(())
     }

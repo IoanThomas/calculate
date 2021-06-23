@@ -10,6 +10,7 @@ pub enum RpnItem {
     Parenthesis(Parenthesis),
 }
 
+#[derive(Debug)]
 pub enum NonConstant {
     Operator(Operator),
     Parenthesis(Parenthesis),

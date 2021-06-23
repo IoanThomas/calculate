@@ -42,7 +42,7 @@ impl ExpressionParser {
             expression.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack)?;
         }
 
-        for non_constant in non_constant_stack {
+        for non_constant in non_constant_stack.drain(0..).rev() {
             match non_constant {
                 parsable_expression::NonConstant::Operator(operator) => {
                     rpn_stack.push(RpnItem::Operator(operator))
