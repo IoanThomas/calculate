@@ -42,14 +42,6 @@ impl ExpressionParser {
         let mut rpn_stack: Vec<RpnItem> = vec![];
         let mut non_constant_stack: Vec<NonConstant> = vec![];
 
-        //for expression in self.parsable_expressions.drain(0..) {
-        //    expression.parse_to_rpn(&tokens, &mut rpn_stack, &mut non_constant_stack)?;
-        //}
-
-        //self.parsable_expressions.drain(0..).enumerate().for_each(|(i, expression)| {
-        //    expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack);
-        //});
-
         for (i, expression) in self.parsable_expressions.drain(0..).enumerate() {
             expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack)?;
         }
@@ -64,11 +56,6 @@ impl ExpressionParser {
                 }
             }
         }
-
-        // TODO: Remove
-        //for r in rpn_stack.iter() {
-        //    println!("{:?}", r);
-        //}
 
         Ok(rpn_stack)
     }
