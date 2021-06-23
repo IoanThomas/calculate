@@ -1,3 +1,5 @@
+use std::env;
+
 use expression_parser::ExpressionParser;
 use rpn_parser::RpnParser;
 
@@ -11,9 +13,12 @@ mod rpn_parse_error;
 mod rpn_parser;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    let expression = args.join("");
+
     let mut expression_parser = ExpressionParser::new();
 
-    let mut rpn_stack = match expression_parser.parse_to_rpn("4*(3+5)/2") {
+    let mut rpn_stack = match expression_parser.parse_to_rpn(&expression) {
         Ok(rpn_stack) => rpn_stack,
         Err(_) => {
             println!("Error whilst parsing expression");
