@@ -94,3 +94,17 @@ fn combined() {
     calculate_assert_eq("4*(3+5)/2", "16");
     calculate_assert_eq("4.6*(1.8+3.2*9)/18", "7.82");
 }
+
+#[test]
+fn unary_plus() {
+    calculate_assert_eq("+5", "5");
+    calculate_assert_eq("+-2.2", "2.2");
+    calculate_assert_eq("+(5-8)", "3");
+}
+
+#[test]
+fn unary_minus() {
+    calculate_assert_eq("-5", "-5");
+    calculate_assert_eq("-+2.2", "-2.2");
+    calculate_assert_eq("-(5-8)", "3");
+}
