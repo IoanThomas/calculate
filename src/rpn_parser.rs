@@ -1,6 +1,6 @@
 use std::ops::Neg;
 
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, Zero};
 
 use crate::operator::Operator;
 use crate::{parsable_expression::RpnItem, rpn_parse_error::RpnParseError};
@@ -48,6 +48,10 @@ impl RpnParser {
             "/" => {
                 let top_value = self.pop_top_value()?;
                 let itr = self.pop_top_value()?;
+
+                if top_value.is_zero() {
+                    return Err(RpnParseError {});
+                }
 
                 // /= Doesn't seem to work with BigDecimal
                 self.value_stack.push(itr / top_value);
