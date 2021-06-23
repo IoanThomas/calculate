@@ -47,12 +47,14 @@ impl ExpressionParser {
             expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack)?;
         }
 
-        for non_constant in non_constant_stack.drain(0..).rev() {
-            match non_constant {
-                NonConstant::Operator(operator) => rpn_stack.push(RpnItem::Operator(operator)),
-                _ => {}
-            }
-        }
+        non_constant_stack
+            .drain(0..)
+            .rev()
+            .for_each(|non_constant| {
+                if let NonConstant::Operator(operator) = non_constant {
+                    rpn_stack.push(RpnItem::Operator(operator))
+                }
+            });
 
         Ok(rpn_stack)
     }

@@ -25,12 +25,10 @@ impl Parenthesis {
                 break;
             }
 
-            match non_constant_stack.pop() {
-                Some(non_constant) => match non_constant {
-                    NonConstant::Operator(operator) => rpn_stack.push(RpnItem::Operator(operator)),
-                    NonConstant::Parenthesis(_) => todo!(),
-                },
-                None => {}
+            if let Some(non_constant) = non_constant_stack.pop() {
+                if let NonConstant::Operator(operator) = non_constant {
+                    rpn_stack.push(RpnItem::Operator(operator))
+                }
             }
         }
 

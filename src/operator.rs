@@ -52,12 +52,11 @@ impl ParsableExpression for Operator {
         if index > 0 {
             match tokens[index - 1].borrow() {
                 InfixItem::Operator(_) => self.make_unary(),
-                InfixItem::Parenthesis(parenthesis) => match parenthesis.variant {
-                    ParenthesisVariant::Left => {
+                InfixItem::Parenthesis(parenthesis) => {
+                    if let ParenthesisVariant::Left = parenthesis.variant {
                         self.make_unary();
                     }
-                    _ => {}
-                },
+                }
                 _ => {}
             }
         } else {
@@ -70,14 +69,10 @@ impl ParsableExpression for Operator {
             while (self.is_left_associative && self.precedence <= top_stack_precedence)
                 || (self.precedence < top_stack_precedence)
             {
-                match non_constant_stack.pop() {
-                    Some(top_stack) => match top_stack {
-                        NonConstant::Operator(operator) => {
-                            rpn_stack.push(RpnItem::Operator(operator))
-                        }
-                        _ => {}
-                    },
-                    None => {}
+                if let Some(top_stack) = non_constant_stack.pop() {
+                    if let NonConstant::Operator(operator) = top_stack {
+                        rpn_stack.push(RpnItem::Operator(operator))
+                    }
                 }
 
                 if non_constant_stack.is_empty() {
