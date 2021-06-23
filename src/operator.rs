@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use crate::{
     expression_parse_error::ExpressionParseError,
     parenthesis::ParenthesisVariant,
-    parsable_expression::{NonConstant, ParsableExpression, RpnItem},
+    parsable_expression::{InfixItem, NonConstant, ParsableExpression, RpnItem},
 };
 
 #[derive(Debug, Clone)]
@@ -44,15 +44,15 @@ impl Operator {
 impl ParsableExpression for Operator {
     fn parse_to_rpn(
         mut self: Box<Self>,
-        tokens: &Vec<RpnItem>,
+        tokens: &Vec<InfixItem>,
         index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         non_constant_stack: &mut Vec<NonConstant>,
     ) -> Result<(), ExpressionParseError> {
         if index > 0 {
             match tokens[index - 1].borrow() {
-                RpnItem::Operator(_) => self.make_unary(),
-                RpnItem::Parenthesis(parenthesis) => match parenthesis.variant {
+                InfixItem::Operator(_) => self.make_unary(),
+                InfixItem::Parenthesis(parenthesis) => match parenthesis.variant {
                     ParenthesisVariant::Left => {
                         self.make_unary();
                     }
@@ -75,7 +75,7 @@ impl ParsableExpression for Operator {
                         NonConstant::Operator(operator) => {
                             rpn_stack.push(RpnItem::Operator(operator))
                         }
-                        NonConstant::Parenthesis(_) => todo!(),
+                        _ => {}
                     },
                     None => {}
                 }

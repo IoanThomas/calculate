@@ -1,6 +1,6 @@
 use crate::{
     expression_parse_error::ExpressionParseError,
-    parsable_expression::{NonConstant, ParsableExpression, RpnItem},
+    parsable_expression::{InfixItem, NonConstant, ParsableExpression, RpnItem},
 };
 
 #[derive(Debug, Clone)]
@@ -53,7 +53,7 @@ impl Parenthesis {
 impl ParsableExpression for Parenthesis {
     fn parse_to_rpn(
         self: Box<Self>,
-        _tokens: &Vec<RpnItem>,
+        _tokens: &Vec<InfixItem>,
         _index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         non_constant_stack: &mut Vec<NonConstant>,

@@ -3,7 +3,8 @@ use std::ops::Neg;
 use bigdecimal::{BigDecimal, Zero};
 
 use crate::operator::Operator;
-use crate::{parsable_expression::RpnItem, rpn_parse_error::RpnParseError};
+use crate::parsable_expression::RpnItem;
+use crate::rpn_parse_error::RpnParseError;
 
 pub struct RpnParser {
     value_stack: Vec<BigDecimal>,
@@ -21,11 +22,6 @@ impl RpnParser {
             match rpn_item {
                 RpnItem::Constant(constant) => self.value_stack.push(constant.value),
                 RpnItem::Operator(operator) => self.parse_operator(operator)?,
-                RpnItem::Parenthesis(_) => {
-                    return Err(RpnParseError {
-                        message: "Unexpected parenthesis",
-                    })
-                }
             }
         }
 

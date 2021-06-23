@@ -8,11 +8,11 @@ use crate::{
     expression_parse_error::ExpressionParseError,
     operator::Operator,
     parenthesis::{Parenthesis, ParenthesisVariant},
-    parsable_expression::{self, NonConstant, ParsableExpression, RpnItem},
+    parsable_expression::{InfixItem, NonConstant, ParsableExpression, RpnItem},
 };
 
 pub struct ExpressionParser {
-    tokens: Vec<RpnItem>,
+    tokens: Vec<InfixItem>,
     parsable_expressions: Vec<Box<dyn ParsableExpression>>,
 }
 
@@ -34,7 +34,7 @@ impl ExpressionParser {
             }
         };
 
-        // Parse to RPN
+        // Parse to list of expressions
         for field in regex.find_iter(expression) {
             self.parse_token(field.as_str())?;
         }
@@ -42,18 +42,15 @@ impl ExpressionParser {
         let mut rpn_stack: Vec<RpnItem> = vec![];
         let mut non_constant_stack: Vec<NonConstant> = vec![];
 
+        // Parse to RPN
         for (i, expression) in self.parsable_expressions.drain(0..).enumerate() {
             expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack)?;
         }
 
         for non_constant in non_constant_stack.drain(0..).rev() {
             match non_constant {
-                parsable_expression::NonConstant::Operator(operator) => {
-                    rpn_stack.push(RpnItem::Operator(operator))
-                }
-                parsable_expression::NonConstant::Parenthesis(parenthesis) => {
-                    rpn_stack.push(RpnItem::Parenthesis(parenthesis))
-                }
+                NonConstant::Operator(operator) => rpn_stack.push(RpnItem::Operator(operator)),
+                _ => {}
             }
         }
 
@@ -73,7 +70,7 @@ impl ExpressionParser {
                     is_left_associative: true,
                 };
                 self.parsable_expressions.push(Box::new(operator.clone()));
-                self.tokens.push(RpnItem::Operator(operator));
+                self.tokens.push(InfixItem::Operator(operator));
             }
             "-" => {
                 let operator = Operator {
@@ -82,7 +79,7 @@ impl ExpressionParser {
                     is_left_associative: true,
                 };
                 self.parsable_expressions.push(Box::new(operator.clone()));
-                self.tokens.push(RpnItem::Operator(operator));
+                self.tokens.push(InfixItem::Operator(operator));
             }
             "*" => {
                 let operator = Operator {
@@ -91,7 +88,7 @@ impl ExpressionParser {
                     is_left_associative: true,
                 };
                 self.parsable_expressions.push(Box::new(operator.clone()));
-                self.tokens.push(RpnItem::Operator(operator));
+                self.tokens.push(InfixItem::Operator(operator));
             }
             "/" => {
                 let operator = Operator {
@@ -100,7 +97,7 @@ impl ExpressionParser {
                     is_left_associative: true,
                 };
                 self.parsable_expressions.push(Box::new(operator.clone()));
-                self.tokens.push(RpnItem::Operator(operator));
+                self.tokens.push(InfixItem::Operator(operator));
             }
             "^" => {
                 let operator = Operator {
@@ -109,7 +106,7 @@ impl ExpressionParser {
                     is_left_associative: false,
                 };
                 self.parsable_expressions.push(Box::new(operator.clone()));
-                self.tokens.push(RpnItem::Operator(operator));
+                self.tokens.push(InfixItem::Operator(operator));
             }
             "(" => {
                 let parenthesis = Parenthesis {
@@ -117,7 +114,7 @@ impl ExpressionParser {
                 };
                 self.parsable_expressions
                     .push(Box::new(parenthesis.clone()));
-                self.tokens.push(RpnItem::Parenthesis(parenthesis));
+                self.tokens.push(InfixItem::Parenthesis(parenthesis));
             }
             ")" => {
                 let parenthesis = Parenthesis {
@@ -125,7 +122,7 @@ impl ExpressionParser {
                 };
                 self.parsable_expressions
                     .push(Box::new(parenthesis.clone()));
-                self.tokens.push(RpnItem::Parenthesis(parenthesis));
+                self.tokens.push(InfixItem::Parenthesis(parenthesis));
             }
             _ => {}
         }
@@ -137,7 +134,7 @@ impl ExpressionParser {
         let constant = Constant { value: number };
 
         self.parsable_expressions.push(Box::new(constant.clone()));
-        self.tokens.push(RpnItem::Constant(constant));
+        self.tokens.push(InfixItem::Constant(constant));
 
         Ok(())
     }

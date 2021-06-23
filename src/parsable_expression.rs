@@ -4,7 +4,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub enum RpnItem {
+pub enum InfixItem {
     Constant(Constant),
     Operator(Operator),
     Parenthesis(Parenthesis),
@@ -16,10 +16,16 @@ pub enum NonConstant {
     Parenthesis(Parenthesis),
 }
 
+#[derive(Debug)]
+pub enum RpnItem {
+    Constant(Constant),
+    Operator(Operator),
+}
+
 pub trait ParsableExpression {
     fn parse_to_rpn(
         self: Box<Self>,
-        tokens: &Vec<RpnItem>,
+        tokens: &Vec<InfixItem>,
         index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         non_constant_stack: &mut Vec<NonConstant>,
