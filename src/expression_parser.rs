@@ -12,12 +12,16 @@ use crate::{
 };
 
 pub struct ExpressionParser {
-    tokens: Vec<Box<dyn ParsableExpression>>,
+    tokens: Vec<RpnItem>,
+    parsable_expressions: Vec<Box<dyn ParsableExpression>>,
 }
 
 impl ExpressionParser {
     pub fn new() -> ExpressionParser {
-        ExpressionParser { tokens: vec![] }
+        ExpressionParser {
+            tokens: vec![],
+            parsable_expressions: vec![],
+        }
     }
 
     pub fn parse_to_rpn(&mut self, expression: &str) -> Result<Vec<RpnItem>, ExpressionParseError> {
@@ -38,8 +42,16 @@ impl ExpressionParser {
         let mut rpn_stack: Vec<RpnItem> = vec![];
         let mut non_constant_stack: Vec<NonConstant> = vec![];
 
-        for expression in self.tokens.drain(0..) {
-            expression.parse_to_rpn(&mut rpn_stack, &mut non_constant_stack)?;
+        //for expression in self.parsable_expressions.drain(0..) {
+        //    expression.parse_to_rpn(&tokens, &mut rpn_stack, &mut non_constant_stack)?;
+        //}
+
+        //self.parsable_expressions.drain(0..).enumerate().for_each(|(i, expression)| {
+        //    expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack);
+        //});
+
+        for (i, expression) in self.parsable_expressions.drain(0..).enumerate() {
+            expression.parse_to_rpn(&self.tokens, i, &mut rpn_stack, &mut non_constant_stack)?;
         }
 
         for non_constant in non_constant_stack.drain(0..).rev() {
@@ -67,37 +79,67 @@ impl ExpressionParser {
         };
 
         match token {
-            "+" => self.tokens.push(Box::new(Operator {
-                symbol: "+",
-                precedence: 2,
-                is_left_associative: true,
-            })),
-            "-" => self.tokens.push(Box::new(Operator {
-                symbol: "-",
-                precedence: 2,
-                is_left_associative: true,
-            })),
-            "*" => self.tokens.push(Box::new(Operator {
-                symbol: "*",
-                precedence: 3,
-                is_left_associative: true,
-            })),
-            "/" => self.tokens.push(Box::new(Operator {
-                symbol: "/",
-                precedence: 3,
-                is_left_associative: true,
-            })),
-            "^" => self.tokens.push(Box::new(Operator {
-                symbol: "^",
-                precedence: 5,
-                is_left_associative: true,
-            })),
-            "(" => self.tokens.push(Box::new(Parenthesis {
-                variant: ParenthesisVariant::Left,
-            })),
-            ")" => self.tokens.push(Box::new(Parenthesis {
-                variant: ParenthesisVariant::Right,
-            })),
+            "+" => {
+                let operator = Operator {
+                    symbol: "+",
+                    precedence: 2,
+                    is_left_associative: true,
+                };
+                self.parsable_expressions.push(Box::new(operator.clone()));
+                self.tokens.push(RpnItem::Operator(operator));
+            }
+            "-" => {
+                let operator = Operator {
+                    symbol: "-",
+                    precedence: 2,
+                    is_left_associative: true,
+                };
+                self.parsable_expressions.push(Box::new(operator.clone()));
+                self.tokens.push(RpnItem::Operator(operator));
+            }
+            "*" => {
+                let operator = Operator {
+                    symbol: "*",
+                    precedence: 3,
+                    is_left_associative: true,
+                };
+                self.parsable_expressions.push(Box::new(operator.clone()));
+                self.tokens.push(RpnItem::Operator(operator));
+            }
+            "/" => {
+                let operator = Operator {
+                    symbol: "/",
+                    precedence: 3,
+                    is_left_associative: true,
+                };
+                self.parsable_expressions.push(Box::new(operator.clone()));
+                self.tokens.push(RpnItem::Operator(operator));
+            }
+            "^" => {
+                let operator = Operator {
+                    symbol: "^",
+                    precedence: 5,
+                    is_left_associative: false,
+                };
+                self.parsable_expressions.push(Box::new(operator.clone()));
+                self.tokens.push(RpnItem::Operator(operator));
+            }
+            "(" => {
+                let parenthesis = Parenthesis {
+                    variant: ParenthesisVariant::Left,
+                };
+                self.parsable_expressions
+                    .push(Box::new(parenthesis.clone()));
+                self.tokens.push(RpnItem::Parenthesis(parenthesis));
+            }
+            ")" => {
+                let parenthesis = Parenthesis {
+                    variant: ParenthesisVariant::Right,
+                };
+                self.parsable_expressions
+                    .push(Box::new(parenthesis.clone()));
+                self.tokens.push(RpnItem::Parenthesis(parenthesis));
+            }
             _ => {}
         }
 
@@ -105,7 +147,10 @@ impl ExpressionParser {
     }
 
     fn parse_number(&mut self, number: BigDecimal) -> Result<(), ExpressionParseError> {
-        self.tokens.push(Box::new(Constant { value: number }));
+        let constant = Constant { value: number };
+
+        self.parsable_expressions.push(Box::new(constant.clone()));
+        self.tokens.push(RpnItem::Constant(constant));
 
         Ok(())
     }

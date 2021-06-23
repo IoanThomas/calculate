@@ -1,3 +1,5 @@
+use std::ops::Neg;
+
 use bigdecimal::BigDecimal;
 
 use crate::operator::Operator;
@@ -54,6 +56,13 @@ impl RpnParser {
                 let _top_value = self.pop_top_value()?;
                 // TODO: BigDecimal doesn't have power operations
                 todo!();
+            }
+            "p" => {
+                *self.get_top_value()? = self.get_top_value()?.abs();
+            }
+            "n" => {
+                let top_value = self.pop_top_value()?;
+                self.value_stack.push(top_value.neg());
             }
             _ => {}
         }

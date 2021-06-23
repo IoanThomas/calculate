@@ -19,6 +19,8 @@ pub enum NonConstant {
 pub trait ParsableExpression {
     fn parse_to_rpn(
         self: Box<Self>,
+        tokens: &Vec<RpnItem>,
+        index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         non_constant_stack: &mut Vec<NonConstant>,
     ) -> Result<(), ExpressionParseError>;

@@ -3,13 +3,13 @@ use crate::{
     parsable_expression::{NonConstant, ParsableExpression, RpnItem},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ParenthesisVariant {
     Left,
     Right,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Parenthesis {
     pub variant: ParenthesisVariant,
 }
@@ -53,6 +53,8 @@ impl Parenthesis {
 impl ParsableExpression for Parenthesis {
     fn parse_to_rpn(
         self: Box<Self>,
+        _tokens: &Vec<RpnItem>,
+        _index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         non_constant_stack: &mut Vec<NonConstant>,
     ) -> Result<(), crate::expression_parse_error::ExpressionParseError> {

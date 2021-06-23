@@ -5,7 +5,7 @@ use crate::{
     parsable_expression::{NonConstant, ParsableExpression, RpnItem},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Constant {
     pub value: BigDecimal,
 }
@@ -13,6 +13,8 @@ pub struct Constant {
 impl ParsableExpression for Constant {
     fn parse_to_rpn(
         self: Box<Self>,
+        _tokens: &Vec<RpnItem>,
+        _index: usize,
         rpn_stack: &mut Vec<RpnItem>,
         _non_constant_stack: &mut Vec<NonConstant>,
     ) -> Result<(), ExpressionParseError> {
