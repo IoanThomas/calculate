@@ -47,9 +47,21 @@ fn addition() {
 }
 
 #[test]
+fn addition_decimal() {
+    calculate_assert_eq("4.4+2.3", "6.7");
+    calculate_assert_eq("0.8+0.1", "0.9");
+}
+
+#[test]
 fn subtraction() {
     calculate_assert_eq("4-3", "1");
     calculate_assert_eq("15-23", "-8");
+}
+
+#[test]
+fn subtraction_decimal() {
+    calculate_assert_eq("4.5-3.3", "1.2");
+    calculate_assert_eq("15.5-23.8", "-8.3");
 }
 
 #[test]
@@ -59,13 +71,26 @@ fn multiplication() {
 }
 
 #[test]
+fn multiplication_decimal() {
+    calculate_assert_eq("4.5*3.2", "14.4");
+    calculate_assert_eq("50*50.2", "2510");
+}
+
+#[test]
 fn division() {
     calculate_assert_eq("26/2", "13");
     calculate_assert_eq("5/2", "2.5");
 }
 
 #[test]
+fn division_decimal() {
+    calculate_assert_eq("26.5/2", "13.25");
+    calculate_assert_eq("5/8", "0.625");
+}
+
+#[test]
 fn combined() {
     calculate_assert_eq("1+1/4", "1.25");
     calculate_assert_eq("4*(3+5)/2", "16");
+    calculate_assert_eq("4.6*(1.8+3.2*9)/18", "7.82");
 }
