@@ -17,10 +17,10 @@ impl RpnParser {
         }
     }
 
-    pub fn parse_rpn(&mut self, rpn_stack: &mut Vec<RpnItem>) -> Result<BigDecimal, RpnParseError> {
-        for rpn_item in rpn_stack.drain(0..) {
+    pub fn parse_rpn(&mut self, rpn_stack: &Vec<RpnItem>) -> Result<BigDecimal, RpnParseError> {
+        for rpn_item in rpn_stack.iter() {
             match rpn_item {
-                RpnItem::Constant(constant) => self.value_stack.push(constant.value),
+                RpnItem::Constant(constant) => self.value_stack.push(constant.value.clone()),
                 RpnItem::Operator(operator) => self.parse_operator(operator)?,
             }
         }
@@ -33,7 +33,7 @@ impl RpnParser {
         }
     }
 
-    fn parse_operator(&mut self, operator: Operator) -> Result<(), RpnParseError> {
+    fn parse_operator(&mut self, operator: &Operator) -> Result<(), RpnParseError> {
         match operator.symbol {
             "+" => {
                 let top_value = self.pop_top_value()?;

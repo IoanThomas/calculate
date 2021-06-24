@@ -18,7 +18,7 @@ fn main() {
 
     let mut expression_parser = ExpressionParser::new();
 
-    let mut rpn_stack = match expression_parser.parse_to_rpn(&expression) {
+    let rpn_stack = match expression_parser.parse_to_rpn(&expression) {
         Ok(rpn_stack) => rpn_stack,
         Err(_) => {
             println!("Error whilst parsing expression");
@@ -28,7 +28,7 @@ fn main() {
 
     let mut rpn_parser = RpnParser::new();
 
-    let result = match rpn_parser.parse_rpn(&mut rpn_stack) {
+    let result = match rpn_parser.parse_rpn(&rpn_stack) {
         Ok(result) => result,
         Err(error) => {
             println!("Error whilst parsing RPN: {}", error.message);
